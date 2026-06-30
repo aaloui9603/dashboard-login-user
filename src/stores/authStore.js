@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { MOCK_USERS } from '../constants/mockUsers'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
