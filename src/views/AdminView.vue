@@ -1,16 +1,27 @@
 <script setup>
-import { computed } from 'vue'
-import { MOCK_USER_LIST } from '@/constants/mockUserList'
+import { ref, computed } from 'vue'
+import { useUserListStore } from '@/stores/userListStore'
 import StatusBadge from '@/components/StatusBadge.vue'
+import AddUserForm from '@/components/AddUserForm.vue'
 
-const totalUsers = computed(() => MOCK_USER_LIST.length)
-const adminCount = computed(() => MOCK_USER_LIST.filter((u) => u.role === 'admin').length)
-const activeCount = computed(() => MOCK_USER_LIST.filter((u) => u.status === 'active').length)
+const userListStore = useUserListStore()
+const showForm = ref(false)
+
+const totalUsers = computed(() => userListStore.users.length)
+const adminCount = computed(() => userListStore.users.filter((u) => u.role === 'admin').length)
+const activeCount = computed(() => userListStore.users.filter((u) => u.status === 'active').length)
 </script>
 
 <template>
   <div class="admin-view">
-    <h1>Admin-Bereich</h1>
+    <div class="header-row">
+      <h1>Admin-Bereich</h1>
+      <button class="add-btn" @click="showForm = !showForm">
+        {{ showForm ? 'Abbrechen' : '+ Neuer User' }}
+      </button>
+    </div>
+
+    <AddUserForm v-if="showForm" @close="showForm = false" />
 
     <div class="stats">
       <div class="stat-card">
@@ -38,7 +49,7 @@ const activeCount = computed(() => MOCK_USER_LIST.filter((u) => u.status === 'ac
           </tr>
         </thead>
         <tbody>
-          <tr v-for="u in MOCK_USER_LIST" :key="u.id">
+          <tr v-for="u in userListStore.users" :key="u.id">
             <td>{{ u.name }}</td>
             <td>{{ u.email }}</td>
             <td>{{ u.role }}</td>
@@ -56,7 +67,31 @@ const activeCount = computed(() => MOCK_USER_LIST.filter((u) => u.status === 'ac
 .admin-view {
   h1 {
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-md);
+    margin: 0;
+  }
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.add-btn {
+  background: var(--color-teal-accent);
+  color: var(--color-teal-bg);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--button-padding-y) var(--spacing-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:hover {
+    opacity: 0.85;
   }
 }
 
