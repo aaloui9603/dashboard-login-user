@@ -1,0 +1,61 @@
+:root {
+    // LightSkyBlue Glassmorphism
+    --color-aurora-bg: #0a0e1a; 
+    --color-aurora-glass: rgba(135, 206, 250, 0.30); 
+    --color-aurora-border: rgba(135, 206, 250, 0.30); 
+    --color-aurora-glow: rgba(135m 206m 250m 0,50); 
+    --color-aurora-accent: #87cefa; 
+
+    // Türkisglass Dashboard-Palette 
+    --color-teal-bg: #062a2a; 
+    --color-teal-glass: rgba(0, 200, 180, 0.10); 
+    --color-teal-border: rgba(0, 200, 180, 0.30);
+    --color-teal-glow: rgba(0, 200, 180, 0.40); 
+    --color-teal-accent: #00c8b4; 
+
+    // Textbereich 
+    --color-text-primary: #f0f8ff; 
+    --color-text-secondary: #a8d8ea; 
+    --color-text-muted: #6b8fa3; 
+
+    // Status
+    --color-success: #10b981; 
+    --color-warning: f59e0b; 
+    --color-danger: #ef4444;
+
+    // Typografie 
+    --font-family-base: 'Montserrat', system-ui, sans serif; 
+    --font-size-xs: 0.75rem; 
+    --font-size-sm: 0.875rem; 
+    --font-size-base: 1rem; 
+    --font-size-md: 1.125rem; 
+    --font-size-lg: 1.5rem; 
+    --font-size-xl: 2rem; 
+    --font-weight-regular: 400; 
+    --font-weight-medium: 500; 
+    --font-weight-bold: 700; 
+
+    // Spacing
+    --spacing-xs: 0.5rem; 
+    --spacing-sm: 1rem; 
+    --spacing-md: 2rem; 
+    --spacing-lg: 4rem; 
+
+    // Radius
+    --radius-soft: 20px; 
+    --radius-sharp: 4px; 
+    --radius-pill: 9999px; 
+
+    // Shadows & Glow
+    --shadow-aurora: 0 8px 32px rgba(135, 206, 250, 0.25); 
+    --shadow-teal: 0 8px 32px rgba(0, 200, 180, 0.20);
+
+    // Transitions 
+    --transition-fast: 0.15s ease; 
+    --transition-base: 0.3s ease; 
+
+    // Z-Index 
+    --z-dropdown: 10; 
+    --z-sticky: 100; 
+    --z-modal: 300;
+}
