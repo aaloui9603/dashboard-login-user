@@ -42,6 +42,7 @@ const authStore = useAuthStore()
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   max-width: 480px;
+  width: 100%;
 }
 
 .avatar-large {
@@ -63,21 +64,35 @@ const authStore = useAuthStore()
   grid-template-columns: auto 1fr;
   gap: var(--spacing-xs) var(--spacing-sm);
   margin: 0;
+  min-width: 0;
 
   dt {
     color: var(--color-text-secondary);
     font-size: var(--font-size-sm);
+    white-space: nowrap;
   }
 
   dd {
     color: var(--color-text-primary);
     font-weight: var(--font-weight-medium);
     margin: 0;
+    overflow-wrap: break-word;
+    min-width: 0;
   }
 
   .role-value {
     color: var(--color-teal-accent);
     text-transform: capitalize;
+  }
+}
+
+// ===== Mobile: weniger Padding, Avatar oberhalb der Details =====
+@media (max-width: 480px) {
+  .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
   }
 }
 </style>

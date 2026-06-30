@@ -27,24 +27,26 @@ const activeCount = computed(() => MOCK_USER_LIST.filter((u) => u.status === 'ac
       </div>
     </div>
 
-    <table class="user-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>E-Mail</th>
-          <th>Rolle</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="u in MOCK_USER_LIST" :key="u.id">
-          <td>{{ u.name }}</td>
-          <td>{{ u.email }}</td>
-          <td>{{ u.role }}</td>
-          <td><StatusBadge :status="u.status" /></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>E-Mail</th>
+            <th>Rolle</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="u in MOCK_USER_LIST" :key="u.id">
+            <td>{{ u.name }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.role }}</td>
+            <td><StatusBadge :status="u.status" /></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -60,13 +62,15 @@ const activeCount = computed(() => MOCK_USER_LIST.filter((u) => u.status === 'ac
 
 .stats {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
 }
 
 .stat-card {
   @include glass-teal;
-  flex: 1;
+  flex: 1 1 100px;
+  min-width: 0;
   padding: var(--spacing-sm);
   text-align: center;
 
@@ -82,9 +86,14 @@ const activeCount = computed(() => MOCK_USER_LIST.filter((u) => u.status === 'ac
   }
 }
 
+.table-wrapper {
+  overflow-x: auto;
+}
+
 .user-table {
   @include glass-teal;
   width: 100%;
+  min-width: 480px;
   border-collapse: collapse;
   padding: var(--spacing-sm);
 

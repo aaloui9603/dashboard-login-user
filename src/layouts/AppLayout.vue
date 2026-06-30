@@ -21,5 +21,13 @@ import AppSidebar from '@/components/AppSidebar.vue'
 .app-content {
   flex: 1;
   padding: var(--spacing-md);
+  min-width: 0; 
+  overflow-x: hidden; 
+}
+
+@media (max-width: 767px ) {
+    .app-content {
+        padding: var(--spacing-sm);
+    }
 }
 </style>
