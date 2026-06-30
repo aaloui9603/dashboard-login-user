@@ -1,15 +1,17 @@
 <script setup>
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
+import { useTasksStore } from '@/stores/tasksStore'
 
 const authStore = useAuthStore()
+const tasksStore = useTasksStore()
 
-// Statische Beispiel-Aufgaben — kein Backend, fest im Code
-const tasks = [
-  { id: 1, text: 'Profil vervollständigen', done: true },
-  { id: 2, text: 'Erste Projektübersicht durchlesen', done: true },
-  { id: 3, text: 'Mit dem Team-Lead Rücksprache halten', done: false },
-  { id: 4, text: 'Wöchentlichen Statusbericht einreichen', done: false },
-]
+const newTaskText = ref('')
+
+function handleAddTask() {
+  tasksStore.addTask(newTaskText.value)
+  newTaskText.value = ''
+}
 </script>
 
 <template>
@@ -27,12 +29,21 @@ const tasks = [
 
     <div class="tasks-card">
       <h2>Meine Aufgaben</h2>
+
+      <form class="add-task-form" @submit.prevent="handleAddTask">
+        <input v-model="newTaskText" type="text" placeholder="Neue Aufgabe..." />
+        <button type="submit">+</button>
+      </form>
+
       <ul class="task-list">
-        <li v-for="task in tasks" :key="task.id" :class="{ done: task.done }">
-          <span class="check">{{ task.done ? '✓' : '○' }}</span>
-          {{ task.text }}
+        <li v-for="task in tasksStore.tasks" :key="task.id" :class="{ done: task.done }">
+          <span class="check" @click="tasksStore.toggleTask(task.id)">{{ task.done ? '✓' : '○' }}</span>
+          <span class="text" @click="tasksStore.toggleTask(task.id)">{{ task.text }}</span>
+          <button class="delete-btn" @click="tasksStore.deleteTask(task.id)" aria-label="Aufgabe löschen">✕</button>
         </li>
       </ul>
+
+      <p v-if="!tasksStore.tasks.length" class="empty-hint">Keine Aufgaben mehr — Mashallah!</p>
     </div>
   </div>
 </template>
@@ -97,6 +108,44 @@ const tasks = [
   padding: var(--spacing-md);
 }
 
+.add-task-form {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+
+  input {
+    flex: 1;
+    background: var(--input-bg);
+    border: 1px solid var(--color-teal-border);
+    border-radius: var(--radius-sharp);
+    padding: var(--input-padding-y) var(--input-padding-x);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-teal-accent);
+    }
+  }
+
+  button {
+    background: var(--color-teal-accent);
+    color: var(--color-teal-bg);
+    border: none;
+    border-radius: var(--radius-sharp);
+    padding: 0 var(--spacing-sm);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-md);
+    cursor: pointer;
+    transition: var(--transition-fast);
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+}
+
 .task-list {
   list-style: none;
   padding: 0;
@@ -112,16 +161,45 @@ const tasks = [
 
     .check {
       color: var(--color-text-muted);
+      cursor: pointer;
+    }
+
+    .text {
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      padding: var(--icon-btn-padding);
+      transition: var(--transition-fast);
+
+      &:hover {
+        color: var(--color-danger);
+      }
     }
 
     &.done {
-      color: var(--color-text-muted);
-      text-decoration: line-through;
+      .text {
+        color: var(--color-text-muted);
+        text-decoration: line-through;
+      }
 
       .check {
         color: var(--color-success);
       }
     }
   }
+}
+
+.empty-hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  margin: var(--spacing-sm) 0 0;
 }
 </style>
