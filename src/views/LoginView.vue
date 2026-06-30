@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import PasswordStrengthMeter from '@/components/PasswordStrengthMeter.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -25,72 +26,68 @@ function handleSubmit() {
     return
   }
 
-  // echte Weiterleitung 
-  router.push({ name: 'dashboard' })  
+  router.push({ name: 'dashboard' })
 }
 </script>
 
 <template>
-    <div class="login-page">
-        <div class="login-card">
-            <h1>Willkommen zurück</h1>
+  <div class="login-page">
+    <div class="login-card">
+      <h1>Willkommen zurück</h1>
 
-            <form v-if="!loginSuccess" @submit.prevent="handleSubmit">
-                <label for="email">E-Mail</label>
-                <input id="email" v-model="email" type="email" autocomplete="userName" />
+      <form @submit.prevent="handleSubmit">
+        <label for="email">E-Mail</label>
+        <input id="email" v-model="email" type="email" autocomplete="username" />
 
-                <label for="password">Passwort</label>
-                <input id="password" v-model="password" type="password" autocomplete="current-password" />
+        <label for="password">Passwort</label>
+        <input id="password" v-model="password" type="password" autocomplete="current-password" />
+        <PasswordStrengthMeter :password="password" />
 
-                <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
 
-                <button type="submit">Einloggen</button>
-            </form>
-
-            <p v-else class="success">
-                Login erfolgreich, {{ authStore.user.name }}!
-            </p>
-        </div>
+        <button type="submit">Einloggen</button>
+      </form>
     </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-@import '../assets/styles/glass'; 
+@import '@/assets/styles/_glass.scss';
 
 .login-page {
-    min-height: 100vh; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    background: var(--color-aurora-bg);
-    padding: var(--spacing-sm);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-aurora-bg);
+  padding: var(--spacing-sm);
 }
 
 .login-card {
-    @include glass-aurora; 
-    width: 100%; 
-    max-width: 360px; 
-    padding: var(--spacing-md); 
+  @include glass-aurora;
+  width: 100%;
+  max-width: 360px;
+  padding: var(--spacing-md);
 
-    h1 {
-        color: var(--color-text-primary);
-        font-size: var(--font-size-lg); 
-        margin-bottom: var(--spacing-sm); 
-        text-align: center;
-    }
+  h1 {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-sm);
+    text-align: center;
+  }
 
-    form {
-        display: flex; 
-        flex-direction: column; 
-        gap: var(--spacing-xs);
-    }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
 
-    label {
-        color: var(--color-text-secondary);
-        font-size: var(--font-size-sm);
-    }
+  label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
 
-    input {
+  input {
     background: var(--input-bg);
     border: 1px solid var(--color-aurora-border);
     border-radius: var(--radius-soft);
@@ -121,16 +118,9 @@ function handleSubmit() {
     }
   }
 
-    .error {
-        color: var(--color-danger);
-        font-size: var(--font-size-sm);
-    }
-
-    .success {
-        color: var(--color-success); 
-        text-align: center; 
-    }
+  .error {
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+  }
 }
-
-
 </style>

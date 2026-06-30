@@ -67,7 +67,6 @@
   --input-padding-y: 0.65rem;
   --input-padding-x: 0.9rem;
   --button-padding-y: 0.75rem;
-  --toggle-size: 40px;
 
   // Tabelle
   --table-cell-padding-y: 0.75rem;
@@ -80,6 +79,12 @@
   // Burger-Button
   --burger-padding-y: 0.4rem;
   --burger-padding-x: 0.7rem;
+
+  // Toggle-Button (B-2)
+  --toggle-size: 40px;
+
+  // Strength Meter (B-1, neu)
+  --strength-bar-height: 6px;
 }
 
 [data-theme="light"] {
@@ -102,4 +107,3 @@
   --color-text-secondary: #3d5a6c;
   --color-text-muted: #7891a0;
 }
-
