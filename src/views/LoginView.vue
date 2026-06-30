@@ -1,30 +1,32 @@
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/authStore'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 
+const router = useRouter()
 const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
-const loginSuccess = ref(false)
 
 function handleSubmit() {
-    errorMessage.value = ''
+  errorMessage.value = ''
 
-    if (!email.value || !password.value) {
-        errorMessage.value = 'Bitte E-Mail und Passwort eingeben.'
-    }
+  if (!email.value || !password.value) {
+    errorMessage.value = 'Bitte E-Mail und Passwort eingeben.'
+    return
+  }
 
-    const result = authStore.loginWithCredentials(email.value, password.value)
+  const result = authStore.loginWithCredentials(email.value, password.value)
 
-    if(!result.success) {
-        errorMessage.value = result.message
-        return
-    }
+  if (!result.success) {
+    errorMessage.value = result.message
+    return
+  }
 
-    loginSuccess.value = true
-
+  // echte Weiterleitung 
+  router.push({ name: 'dashboard' })  
 }
 </script>
 
