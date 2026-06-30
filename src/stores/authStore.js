@@ -19,6 +19,19 @@ export const useAuthStore = defineStore('auth', {
             this.role = null; 
             this.isLoggedIn = false;
         },
+
+        loginWithCredentials(email, password) {
+            const foundUser = MOCK_USERS.find(
+                (u) => u.email === email && u.password === password
+            )
+
+            if (!foundUser) {
+                return { success: false, message: 'E-Mail oder Passwort ist falsch.'}
+            }
+
+            this.login(foundUser)
+            return { success: true}
+        },
     },
 
     persist: true,
