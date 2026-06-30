@@ -17,18 +17,18 @@ defineProps({
 <style lang="scss" scoped>
 .badge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
+  padding: var(--badge-padding-y) var(--badge-padding-x);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
 
   &.active {
-    background: rgba(16, 185, 129, 0.15);
+    background: var(--color-success-bg);
     color: var(--color-success);
   }
 
   &.inactive {
-    background: rgba(239, 68, 68, 0.15);
+    background: var(--color-danger-bg);
     color: var(--color-danger);
   }
 }

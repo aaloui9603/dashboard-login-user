@@ -99,7 +99,7 @@ const activeCount = computed(() => MOCK_USER_LIST.filter((u) => u.status === 'ac
 
   th, td {
     text-align: left;
-    padding: 0.75rem 1rem;
+    padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
     color: var(--color-text-primary);
     border-bottom: 1px solid var(--color-teal-border);
   }

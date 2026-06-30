@@ -1,19 +1,19 @@
-// Aurora-Glas 
+// Aurora-Glas
 @mixin glass-aurora {
-    background: var(--color-aurora-glass); 
-    border: 1px solid var(--color-aurora-border);
-    border-radius: var(--radius-soft); 
-    backdrop-filter: blur(16px); 
-    -webkit-backdrop-filter: blur(16px); 
-    box-shadow: var(--shadow-aurrora); 
+  background: var(--color-aurora-glass);
+  border: 1px solid var(--color-aurora-border);
+  border-radius: var(--radius-soft);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-aurora);
 }
 
 // Türkisglass
 @mixin glass-teal {
-    background-teal: var(--color-teal-glass); 
-    border: 1px solid var(--color-teal-border);
-    border-radius: var(--radius-sharp);
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px); 
-    box-shadow: var(--shadow-teal);
+  background: var(--color-teal-glass);
+  border: 1px solid var(--color-teal-border);
+  border-radius: var(--radius-sharp);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-teal);
 }

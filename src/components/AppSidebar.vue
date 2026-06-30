@@ -54,7 +54,7 @@ function closeSidebar() {
   border-radius: var(--radius-sharp);
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
-  padding: 0.4rem 0.7rem;
+  padding: var(--burger-padding-y) var(--burger-padding-x);
   cursor: pointer;
 }
 
@@ -63,7 +63,7 @@ function closeSidebar() {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: var(--z-overlay, 200);
+  z-index: var(--z-overlay);
 }
 
 .sidebar {
