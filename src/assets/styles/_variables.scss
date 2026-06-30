@@ -67,6 +67,7 @@
   --input-padding-y: 0.65rem;
   --input-padding-x: 0.9rem;
   --button-padding-y: 0.75rem;
+  --toggle-size: 40px;
 
   // Tabelle
   --table-cell-padding-y: 0.75rem;
@@ -80,3 +81,25 @@
   --burger-padding-y: 0.4rem;
   --burger-padding-x: 0.7rem;
 }
+
+[data-theme="light"] {
+  // Aurora Light Pastell
+  --color-aurora-bg: #eaf4ff;
+  --color-aurora-glass: rgba(173, 216, 250, 0.35);
+  --color-aurora-border: rgba(135, 206, 250, 0.45);
+  --color-aurora-glow: rgba(135, 206, 250, 0.35);
+  --color-aurora-accent: #4ea8de;
+
+  // Türkis Light Pastell
+  --color-teal-bg: #eafaf7;
+  --color-teal-glass: rgba(0, 200, 180, 0.12);
+  --color-teal-border: rgba(0, 200, 180, 0.35);
+  --color-teal-glow: rgba(0, 200, 180, 0.25);
+  --color-teal-accent: #009688;
+
+  // Text — jetzt dunkel, weil der Hintergrund hell ist
+  --color-text-primary: #0a1f2e;
+  --color-text-secondary: #3d5a6c;
+  --color-text-muted: #7891a0;
+}
+
