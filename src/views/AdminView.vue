@@ -1,15 +1,45 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/authStore'
 import { useUserListStore } from '@/stores/userListStore'
 import StatusBadge from '@/components/StatusBadge.vue'
 import AddUserForm from '@/components/AddUserForm.vue'
 
+const authStore = useAuthStore()
 const userListStore = useUserListStore()
+const toast = useToast()
+
 const showForm = ref(false)
+const pendingDeleteId = ref(null)
 
 const totalUsers = computed(() => userListStore.users.length)
 const adminCount = computed(() => userListStore.users.filter((u) => u.role === 'admin').length)
 const activeCount = computed(() => userListStore.users.filter((u) => u.status === 'active').length)
+
+function isSelf(user) {
+  return user.email === authStore.user?.email
+}
+
+function requestDelete(id) {
+  pendingDeleteId.value = id
+}
+
+function cancelDelete() {
+  pendingDeleteId.value = null
+}
+
+function confirmDelete(id) {
+  const result = userListStore.deleteUser(id)
+
+  if (!result.success) {
+    toast.error(result.message)
+  } else {
+    toast.success('User gelöscht.')
+  }
+
+  pendingDeleteId.value = null
+}
 </script>
 
 <template>
@@ -46,6 +76,7 @@ const activeCount = computed(() => userListStore.users.filter((u) => u.status ==
             <th>E-Mail</th>
             <th>Rolle</th>
             <th>Status</th>
+            <th>Aktionen</th>
           </tr>
         </thead>
         <tbody>
@@ -54,6 +85,23 @@ const activeCount = computed(() => userListStore.users.filter((u) => u.status ==
             <td>{{ u.email }}</td>
             <td>{{ u.role }}</td>
             <td><StatusBadge :status="u.status" /></td>
+            <td class="actions-cell">
+              <template v-if="pendingDeleteId === u.id">
+                <span class="confirm-text">Wirklich löschen?</span>
+                <button class="confirm-btn" @click="confirmDelete(u.id)">Ja</button>
+                <button class="cancel-btn" @click="cancelDelete">Nein</button>
+              </template>
+              <template v-else>
+                <button
+                  class="delete-btn"
+                  :disabled="isSelf(u)"
+                  :title="isSelf(u) ? 'Du kannst dich nicht selbst löschen' : 'User löschen'"
+                  @click="requestDelete(u.id)"
+                >
+                  Löschen
+                </button>
+              </template>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -128,7 +176,7 @@ const activeCount = computed(() => userListStore.users.filter((u) => u.status ==
 .user-table {
   @include glass-teal;
   width: 100%;
-  min-width: 480px;
+  min-width: 560px;
   border-collapse: collapse;
   padding: var(--spacing-sm);
 
@@ -147,6 +195,67 @@ const activeCount = computed(() => userListStore.users.filter((u) => u.status ==
 
   tr:last-child td {
     border-bottom: none;
+  }
+}
+
+.actions-cell {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.delete-btn {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-pill);
+  padding: 4px var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.confirm-text {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.confirm-btn {
+  background: var(--color-danger);
+  color: var(--color-teal-bg);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 4px var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.cancel-btn {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-teal-border);
+  border-radius: var(--radius-pill);
+  padding: 4px var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
   }
 }
 </style>

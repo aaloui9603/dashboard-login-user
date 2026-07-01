@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', {
         user: null,
         role: null,
         isLoggedIn: false,
+        profileImage: null,
 
         // 2-Faktor-Authentifizierung Zwischenzustand
         pendingUser: null,
@@ -24,6 +25,7 @@ export const useAuthStore = defineStore('auth', {
             this.user = null;
             this.role = null;
             this.isLoggedIn = false;
+            this.profileImage = null;
             this.clearPending2FA();
         },
 
@@ -76,21 +78,30 @@ export const useAuthStore = defineStore('auth', {
         changePassword(currentPassword, newPassword) {
             const foundUser = MOCK_USERS.find((u) => u.email === this.user?.email)
 
-            if(!foundUser) {
-                return { success: false, message: 'User nicht gefunden.'}
+            if (!foundUser) {
+                return { success: false, message: 'User nicht gefunden.' }
             }
 
             if (foundUser.password !== currentPassword) {
-                return { success: false, message: 'Aktuelles Passwort ist falsch.'}
+                return { success: false, message: 'Aktuelles Passwort ist falsch.' }
             }
 
             if (newPassword === currentPassword) {
-                return { success: false, message: 'Achtung, das neue Passwort muss vom alten unterschieden werden!'}
+                return { success: false, message: 'Achtung, das neue Passwort muss vom alten unterschieden werden!' }
             }
 
             foundUser.password = newPassword
-            return { success: true} 
-        }
+            return { success: true }
+        },
+
+        updateProfileImage(base64Image) {
+            this.profileImage = base64Image
+            return { success: true }
+        },
+
+        removeProfileImage() {
+            this.profileImage = null
+        },
     },
 
     persist: true,

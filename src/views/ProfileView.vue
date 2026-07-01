@@ -13,6 +13,12 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const errorMessage = ref('')
 
+const fileInput = ref(null)
+const imageError = ref('')
+
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const MAX_SIZE_BYTES = 1 * 1024 * 1024 // 1 MB
+
 function togglePasswordForm() {
   showPasswordForm.value = !showPasswordForm.value
   errorMessage.value = ''
@@ -44,6 +50,55 @@ function handleChangePassword() {
   toast.success('Passwort erfolgreich geändert!')
   togglePasswordForm()
 }
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden.'))
+    reader.readAsDataURL(file)
+  })
+}
+
+async function handleImageChange(event) {
+  imageError.value = ''
+  const file = event.target.files[0]
+
+  if (!file) {
+    return
+  }
+
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    imageError.value = 'Nur JPEG, PNG oder WebP erlaubt.'
+    event.target.value = ''
+    return
+  }
+
+  if (file.size > MAX_SIZE_BYTES) {
+    imageError.value = 'Bild ist zu groß. Maximal 1 MB erlaubt.'
+    event.target.value = ''
+    return
+  }
+
+  try {
+    const base64 = await fileToBase64(file)
+    authStore.updateProfileImage(base64)
+    toast.success('Profilbild aktualisiert!')
+  } catch (err) {
+    imageError.value = err.message
+  }
+
+  event.target.value = ''
+}
+
+function handleRemoveImage() {
+  authStore.removeProfileImage()
+  toast.info('Profilbild entfernt.')
+}
 </script>
 
 <template>
@@ -51,7 +106,39 @@ function handleChangePassword() {
     <h1>Mein Profil</h1>
 
     <div class="profile-card">
-      <div class="avatar-large">{{ authStore.user?.name?.charAt(0) }}</div>
+      <div class="avatar-wrapper">
+        <img
+          v-if="authStore.profileImage"
+          :src="authStore.profileImage"
+          alt="Profilbild"
+          class="avatar-large avatar-image"
+        />
+        <div v-else class="avatar-large">{{ authStore.user?.name?.charAt(0) }}</div>
+
+        <div class="avatar-actions">
+          <button type="button" class="avatar-btn" @click="triggerFileInput">
+            Bild ändern
+          </button>
+          <button
+            v-if="authStore.profileImage"
+            type="button"
+            class="avatar-btn avatar-btn-remove"
+            @click="handleRemoveImage"
+          >
+            Entfernen
+          </button>
+        </div>
+
+        <input
+          ref="fileInput"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          class="hidden-input"
+          @change="handleImageChange"
+        />
+
+        <p v-if="imageError" class="error">{{ imageError }}</p>
+      </div>
 
       <dl class="profile-details">
         <dt>Name</dt>
@@ -126,6 +213,15 @@ function handleChangePassword() {
   width: 100%;
 }
 
+.avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+  width: 110px;
+}
+
 .avatar-large {
   width: 88px;
   height: 88px;
@@ -140,7 +236,48 @@ function handleChangePassword() {
   font-weight: var(--font-weight-bold);
 }
 
+.avatar-image {
+  object-fit: cover;
+}
+
+.avatar-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.avatar-btn {
+  background: transparent;
+  color: var(--color-teal-accent);
+  border: 1px solid var(--color-teal-accent);
+  border-radius: var(--radius-pill);
+  padding: 4px var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.avatar-btn-remove {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.hidden-input {
+  display: none;
+}
+
+.avatar-wrapper .error {
+  text-align: center; 
+  font-size: var(--font-size-sm);
+  word-break: break-word;
+}
+
 .profile-details {
+  flex: 1; 
+  min-width: 0;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--spacing-xs) var(--spacing-sm);
@@ -244,7 +381,7 @@ function handleChangePassword() {
   }
 }
 
-// Mobile: weniger Padding, Avatar oberhalb der Details 
+// ===== Mobile: weniger Padding, Avatar oberhalb der Details =====
 @media (max-width: 480px) {
   .profile-card {
     flex-direction: column;

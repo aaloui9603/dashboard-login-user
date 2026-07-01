@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { MOCK_USER_LIST } from '../constants/mockUserList'
+import { useAuthStore } from './authStore'
 
 export const useUserListStore = defineStore('userList', {
     state: () => ({
@@ -13,6 +14,22 @@ export const useUserListStore = defineStore('userList', {
             : 1
 
             this.users.push({ id: newId, name, email, role, status})
+        },
+
+        deleteUser(id) {
+            const authStore = useAuthStore()
+            const userToDelete = this.users.find((u) => u.id === id)
+
+            if (!userToDelete) {
+                return { success: false, message: 'User nicht gefunden.' }
+            }
+
+            if (userToDelete.email === authStore.user?.email) {
+                return { success: false, message: 'Du kannst dich nicht selbst löschen.' }
+            }
+
+            this.users = this.users.filter((u) => u.id !== id)
+            return { success: true }
         },
     },
 
