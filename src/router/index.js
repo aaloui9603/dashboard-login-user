@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/authStore'
 import LoginView from '../views/LoginView.vue'
+import TwoFactorView from '../views/TwoFactorView.vue'
 import AppLayout from '../layouts/AppLayout.vue'
 import DashboardView from '../views/DashboardView.vue'
 import AdminView from '../views/AdminView.vue'
@@ -9,6 +10,7 @@ import NotFoundView from '../views/NotFoundView.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: LoginView },
+  { path: '/2fa-verify', name: '2fa-verify', component: TwoFactorView, meta: { requires2FA: true } },
   {
     path: '/',
     component: AppLayout,
@@ -32,6 +34,11 @@ router.beforeEach((to, from) => {
 
   // "Tür" verlangt Login, keiner ist eingeloggt also zurück zum Login
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    return { name: 'login' }
+  }
+
+  // "Tür" verlangt ausstehende 2FA-Verifizierung, die nicht vorliegt -> zurück zum Login
+  if (to.meta.requires2FA && !authStore.pending2FA) {
     return { name: 'login' }
   }
 

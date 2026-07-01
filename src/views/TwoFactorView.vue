@@ -3,59 +3,68 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/authStore'
-import PasswordStrengthMeter from '@/components/PasswordStrengthMeter.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 
-const email = ref('')
-const password = ref('')
+const code = ref('')
 const errorMessage = ref('')
 
-function handleSubmit() {
+function handleVerify() {
   errorMessage.value = ''
 
-  if (!email.value || !password.value) {
-    errorMessage.value = 'Bitte E-Mail und Passwort eingeben.'
+  if (!code.value) {
+    errorMessage.value = 'Bitte gib den Bestätigungscode ein.'
     return
   }
 
-  const result = authStore.loginWithCredentials(email.value, password.value)
+  const result = authStore.verifyCode(code.value)
 
   if (!result.success) {
     errorMessage.value = result.message
     return
   }
 
-  if (result.requires2FA) {
-    toast.info(`Dein Bestätigungscode lautet: ${result.code}`, {
-      timeout: 8000,
-    })
-    router.push({ name: '2fa-verify' })
+  toast.success('Erfolgreich verifiziert!')
+  router.push({ name: 'dashboard' })
+}
+
+function handleResend() {
+  const newCode = authStore.resendCode()
+
+  if (!newCode) {
+    errorMessage.value = 'Keine Verifizierung ausstehend. Bitte erneut einloggen.'
     return
   }
 
-  router.push({ name: 'dashboard' })
+  toast.info(`Neuer Bestätigungscode: ${newCode}`, { timeout: 8000 })
 }
 </script>
 
 <template>
-  <div class="login-page">
-    <div class="login-card">
-      <h1>Willkommen zurück</h1>
+  <div class="tfa-page">
+    <div class="tfa-card">
+      <h1>Bestätigungscode eingeben</h1>
+      <p class="hint">Wir haben dir einen 6-stelligen Code gesendet.</p>
 
-      <form @submit.prevent="handleSubmit">
-        <label for="email">E-Mail</label>
-        <input id="email" v-model="email" type="email" autocomplete="username" />
-
-        <label for="password">Passwort</label>
-        <input id="password" v-model="password" type="password" autocomplete="current-password" />
-        <PasswordStrengthMeter :password="password" />
+      <form @submit.prevent="handleVerify">
+        <label for="code">Code</label>
+        <input
+          id="code"
+          v-model="code"
+          type="text"
+          inputmode="numeric"
+          maxlength="6"
+          autocomplete="one-time-code"
+        />
 
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
 
-        <button type="submit">Einloggen</button>
+        <button type="submit">Bestätigen</button>
+        <button type="button" class="resend" @click="handleResend">
+          Code erneut senden
+        </button>
       </form>
     </div>
   </div>
@@ -64,7 +73,7 @@ function handleSubmit() {
 <style lang="scss" scoped>
 @import '@/assets/styles/_glass.scss';
 
-.login-page {
+.tfa-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -73,7 +82,7 @@ function handleSubmit() {
   padding: var(--spacing-sm);
 }
 
-.login-card {
+.tfa-card {
   @include glass-aurora;
   width: 100%;
   max-width: 360px;
@@ -82,8 +91,15 @@ function handleSubmit() {
   h1 {
     color: var(--color-text-primary);
     font-size: var(--font-size-lg);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
     text-align: center;
+  }
+
+  .hint {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    margin-bottom: var(--spacing-sm);
   }
 
   form {
@@ -105,6 +121,8 @@ function handleSubmit() {
     color: var(--color-text-primary);
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
+    text-align: center;
+    letter-spacing: 0.3em;
 
     &:focus {
       outline: none;
@@ -114,14 +132,27 @@ function handleSubmit() {
 
   button {
     margin-top: var(--spacing-xs);
-    background: var(--color-aurora-accent);
-    color: var(--color-aurora-bg);
     border: none;
     border-radius: var(--radius-pill);
     padding: var(--button-padding-y);
     font-weight: var(--font-weight-bold);
     cursor: pointer;
     transition: var(--transition-fast);
+  }
+
+  button[type='submit'] {
+    background: var(--color-aurora-accent);
+    color: var(--color-aurora-bg);
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  .resend {
+    background: transparent;
+    color: var(--color-aurora-accent);
+    border: 1px solid var(--color-aurora-border);
 
     &:hover {
       opacity: 0.85;
