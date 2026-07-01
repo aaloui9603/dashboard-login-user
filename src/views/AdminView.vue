@@ -40,6 +40,18 @@ function confirmDelete(id) {
 
   pendingDeleteId.value = null
 }
+
+function handleRoleChange(user, event) {
+  const newRole = event.target.value
+  const result = userListStore.changeUserRole(user.id, newRole)
+
+  if (!result.success) {
+    toast.error(result.message)
+    event.target.value = user.role // UI zurücksetzen auf alten Wert
+  } else {
+    toast.success(`Rolle von ${user.name} geändert zu "${newRole}".`)
+  }
+}
 </script>
 
 <template>
@@ -83,7 +95,16 @@ function confirmDelete(id) {
           <tr v-for="u in userListStore.users" :key="u.id">
             <td>{{ u.name }}</td>
             <td>{{ u.email }}</td>
-            <td>{{ u.role }}</td>
+            <td>
+              <select
+                class="role-select"
+                :value="u.role"
+                @change="handleRoleChange(u, $event)"
+              >
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+              </select>
+            </td>
             <td><StatusBadge :status="u.status" /></td>
             <td class="actions-cell">
               <template v-if="pendingDeleteId === u.id">
@@ -195,6 +216,22 @@ function confirmDelete(id) {
 
   tr:last-child td {
     border-bottom: none;
+  }
+}
+
+.role-select {
+  background: var(--input-bg);
+  border: 1px solid var(--color-teal-border);
+  border-radius: var(--radius-sharp);
+  padding: 2px var(--spacing-xs);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-teal-accent);
   }
 }
 
