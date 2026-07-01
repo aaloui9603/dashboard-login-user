@@ -2,9 +2,11 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useTasksStore } from '@/stores/tasksStore'
+import { useToast } from 'vue-toastification'
 
 const authStore = useAuthStore()
 const tasksStore = useTasksStore()
+const toast = useToast()
 
 const newTaskText = ref('')
 const selectedCategoryId = ref('')
@@ -24,7 +26,14 @@ function handleAddTask() {
 
 function handleAddCategory() {
   if (!newCategoryName.value.trim()) return
-  tasksStore.addCategory(newCategoryName.value, newCategoryColor.value)
+
+  const result = tasksStore.addCategory(newCategoryName.value, newCategoryColor.value)
+
+  if (!result.success) {
+    toast.error(result.message)
+    return
+  }
+
   newCategoryName.value = ''
   newCategoryColor.value = '#2dd4bf'
 }
@@ -69,7 +78,7 @@ function resetFilters() {
           v-model="newCategoryName"
           type="text"
           placeholder="Neue Kategorie..."
-          maxlength="20"
+          
         />
         <input v-model="newCategoryColor" type="color" aria-label="Kategoriefarbe" />
         <button type="submit">+</button>
