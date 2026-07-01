@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useTasksStore } from '@/stores/tasksStore'
 
@@ -11,6 +11,9 @@ const selectedCategoryId = ref('')
 
 const newCategoryName = ref('')
 const newCategoryColor = ref('#2dd4bf')
+
+const statusFilter = ref('all')
+const categoryFilterId = ref('')
 
 function handleAddTask() {
   const categoryId = selectedCategoryId.value ? Number(selectedCategoryId.value) : null
@@ -24,6 +27,24 @@ function handleAddCategory() {
   tasksStore.addCategory(newCategoryName.value, newCategoryColor.value)
   newCategoryName.value = ''
   newCategoryColor.value = '#2dd4bf'
+}
+
+const filteredTasks = computed(() => {
+  return tasksStore.tasks.filter((task) => {
+    if (statusFilter.value === 'open' && task.done) return false
+    if (statusFilter.value === 'done' && !task.done) return false
+
+    if (categoryFilterId.value && task.categoryId !== Number(categoryFilterId.value)) {
+      return false
+    }
+
+    return true
+  })
+})
+
+function resetFilters() {
+  statusFilter.value = 'all'
+  categoryFilterId.value = ''
 }
 </script>
 
@@ -87,8 +108,38 @@ function handleAddCategory() {
         <button type="submit">+</button>
       </form>
 
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label for="statusFilter">Status</label>
+          <select id="statusFilter" v-model="statusFilter">
+            <option value="all">Alle</option>
+            <option value="open">Offen</option>
+            <option value="done">Erledigt</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="categoryFilter">Kategorie</label>
+          <select id="categoryFilter" v-model="categoryFilterId">
+            <option value="">Alle</option>
+            <option v-for="category in tasksStore.categories" :key="category.id" :value="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
+        <button
+          v-if="statusFilter !== 'all' || categoryFilterId"
+          type="button"
+          class="reset-filter-btn"
+          @click="resetFilters"
+        >
+          Filter zurücksetzen
+        </button>
+      </div>
+
       <ul class="task-list">
-        <li v-for="task in tasksStore.tasks" :key="task.id" :class="{ done: task.done }">
+        <li v-for="task in filteredTasks" :key="task.id" :class="{ done: task.done }">
           <span class="check" @click="tasksStore.toggleTask(task.id)">{{ task.done ? '✓' : '○' }}</span>
           <span
             v-if="task.categoryId"
@@ -102,6 +153,9 @@ function handleAddCategory() {
         </li>
       </ul>
 
+      <p v-if="!filteredTasks.length && tasksStore.tasks.length" class="empty-hint">
+        Keine Aufgaben passen zu deinem Filter.
+      </p>
       <p v-if="!tasksStore.tasks.length" class="empty-hint">Keine Aufgaben mehr — Mashallah!</p>
     </div>
   </div>
@@ -314,6 +368,58 @@ function handleAddCategory() {
     &:hover {
       opacity: 0.85;
     }
+  }
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-teal-border);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+  }
+
+  select {
+    background: var(--input-bg);
+    border: 1px solid var(--color-teal-border);
+    border-radius: var(--radius-sharp);
+    padding: var(--input-padding-y) var(--input-padding-x);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-teal-accent);
+    }
+  }
+}
+
+.reset-filter-btn {
+  background: transparent;
+  color: var(--color-teal-accent);
+  border: 1px solid var(--color-teal-accent);
+  border-radius: var(--radius-pill);
+  padding: 4px var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:hover {
+    opacity: 0.85;
   }
 }
 
