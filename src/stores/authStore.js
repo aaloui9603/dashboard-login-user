@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { MOCK_USERS } from '../constants/mockUsers'
+import { useUserListStore } from './userListStore'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -36,6 +37,13 @@ export const useAuthStore = defineStore('auth', {
 
             if (!foundUser) {
                 return { success: false, message: 'E-Mail oder Passwort ist falsch.'}
+            }
+
+            const userListStore = useUserListStore()
+            const listEntry = userListStore.users.find((u) => u.email === email)
+
+            if (listEntry && listEntry.status !== 'active') {
+                return { success: false, message: 'Dein Account wurde deaktiviert. Bitte wende dich an einen Administrator.' }
             }
 
             this.pendingUser = foundUser

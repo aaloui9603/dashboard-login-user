@@ -52,6 +52,20 @@ function handleRoleChange(user, event) {
     toast.success(`Rolle von ${user.name} geändert zu "${newRole}".`)
   }
 }
+
+function handleToggleStatus(user) {
+  const result = userListStore.toggleUserStatus(user.id)
+
+  if (!result.success) {
+    toast.error(result.message)
+  } else {
+    toast.success(
+      result.newStatus === 'active'
+        ? `${user.name} wurde aktiviert.`
+        : `${user.name} wurde deaktiviert.`
+    )
+  }
+}
 </script>
 
 <template>
@@ -113,6 +127,15 @@ function handleRoleChange(user, event) {
                 <button class="cancel-btn" @click="cancelDelete">Nein</button>
               </template>
               <template v-else>
+                <button
+                  class="status-btn"
+                  :class="{ 'status-btn-activate': u.status !== 'active' }"
+                  :disabled="isSelf(u)"
+                  :title="isSelf(u) ? 'Du kannst dich nicht selbst deaktivieren' : ''"
+                  @click="handleToggleStatus(u)"
+                >
+                  {{ u.status === 'active' ? 'Deaktivieren' : 'Aktivieren' }}
+                </button>
                 <button
                   class="delete-btn"
                   :disabled="isSelf(u)"
@@ -260,6 +283,31 @@ function handleRoleChange(user, event) {
     opacity: 0.35;
     cursor: not-allowed;
   }
+}
+
+.status-btn {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-teal-border);
+  border-radius: var(--radius-pill);
+  padding: 4px var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.status-btn-activate {
+  color: var(--color-success);
+  border-color: var(--color-success);
 }
 
 .confirm-text {

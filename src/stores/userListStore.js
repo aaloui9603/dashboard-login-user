@@ -51,6 +51,22 @@ export const useUserListStore = defineStore('userList', {
             targetUser.role = newRole
             return { success: true }
         },
+
+        toggleUserStatus(id) {
+            const authStore = useAuthStore()
+            const targetUser = this.users.find((u) => u.id === id)
+
+            if (!targetUser) {
+                return { success: false, message: 'User nicht gefunden.'}
+            }
+
+            if (targetUser.email === authStore.user?.email) {
+                return { success: false, message: 'Du kannst dich nicht selbst deaktivieren!'}
+            }
+
+            targetUser.status = targetUser.status === 'active' ? 'inactive' : 'active'
+            return { success: true, newStatus: targetUser.status }
+        }
     },
 
     persist: true
