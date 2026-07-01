@@ -1,7 +1,49 @@
 <script setup>
+import { ref } from 'vue'
+import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/authStore'
+import PasswordStrengthMeter from '@/components/PasswordStrengthMeter.vue'
 
 const authStore = useAuthStore()
+const toast = useToast()
+
+const showPasswordForm = ref(false)
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const errorMessage = ref('')
+
+function togglePasswordForm() {
+  showPasswordForm.value = !showPasswordForm.value
+  errorMessage.value = ''
+  currentPassword.value = ''
+  newPassword.value = ''
+  confirmPassword.value = ''
+}
+
+function handleChangePassword() {
+  errorMessage.value = ''
+
+  if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
+    errorMessage.value = 'Bitte alle Felder ausfüllen.'
+    return
+  }
+
+  if (newPassword.value !== confirmPassword.value) {
+    errorMessage.value = 'Neue Passwörter stimmen nicht überein.'
+    return
+  }
+
+  const result = authStore.changePassword(currentPassword.value, newPassword.value)
+
+  if (!result.success) {
+    errorMessage.value = result.message
+    return
+  }
+
+  toast.success('Passwort erfolgreich geändert!')
+  togglePasswordForm()
+}
 </script>
 
 <template>
@@ -21,6 +63,45 @@ const authStore = useAuthStore()
         <dt>Rolle</dt>
         <dd class="role-value">{{ authStore.role }}</dd>
       </dl>
+    </div>
+
+    <button class="toggle-btn" @click="togglePasswordForm">
+      {{ showPasswordForm ? 'Abbrechen' : 'Passwort ändern' }}
+    </button>
+
+    <div v-if="showPasswordForm" class="password-card">
+      <h2>Passwort ändern</h2>
+
+      <form @submit.prevent="handleChangePassword">
+        <label for="currentPassword">Aktuelles Passwort</label>
+        <input
+          id="currentPassword"
+          v-model="currentPassword"
+          type="password"
+          autocomplete="current-password"
+        />
+
+        <label for="newPassword">Neues Passwort</label>
+        <input
+          id="newPassword"
+          v-model="newPassword"
+          type="password"
+          autocomplete="new-password"
+        />
+        <PasswordStrengthMeter :password="newPassword" />
+
+        <label for="confirmPassword">Neues Passwort bestätigen</label>
+        <input
+          id="confirmPassword"
+          v-model="confirmPassword"
+          type="password"
+          autocomplete="new-password"
+        />
+
+        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+
+        <button type="submit">Speichern</button>
+      </form>
     </div>
   </div>
 </template>
@@ -86,7 +167,84 @@ const authStore = useAuthStore()
   }
 }
 
-// ===== Mobile: weniger Padding, Avatar oberhalb der Details =====
+.toggle-btn {
+  margin-top: var(--spacing-md);
+  background: transparent;
+  color: var(--color-teal-accent);
+  border: 1px solid var(--color-teal-accent);
+  border-radius: var(--radius-pill);
+  padding: var(--button-padding-y) var(--spacing-md);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.password-card {
+  @include glass-teal;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-lg);
+  max-width: 480px;
+  width: 100%;
+
+  h2 {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-md);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  input {
+    background: var(--input-bg);
+    border: 1px solid var(--color-teal-accent);
+    border-radius: var(--radius-soft);
+    padding: var(--input-padding-y) var(--input-padding-x);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-teal-accent);
+    }
+  }
+
+  button[type='submit'] {
+    margin-top: var(--spacing-xs);
+    background: var(--color-teal-accent);
+    color: var(--color-teal-bg);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: var(--button-padding-y);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: var(--transition-fast);
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  .error {
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+  }
+}
+
+// Mobile: weniger Padding, Avatar oberhalb der Details 
 @media (max-width: 480px) {
   .profile-card {
     flex-direction: column;

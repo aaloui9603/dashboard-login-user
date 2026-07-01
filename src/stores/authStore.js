@@ -72,6 +72,25 @@ export const useAuthStore = defineStore('auth', {
             this.pending2FA = false
             this.generatedCode = null
         },
+
+        changePassword(currentPassword, newPassword) {
+            const foundUser = MOCK_USERS.find((u) => u.email === this.user?.email)
+
+            if(!foundUser) {
+                return { success: false, message: 'User nicht gefunden.'}
+            }
+
+            if (foundUser.password !== currentPassword) {
+                return { success: false, message: 'Aktuelles Passwort ist falsch.'}
+            }
+
+            if (newPassword === currentPassword) {
+                return { success: false, message: 'Achtung, das neue Passwort muss vom alten unterschieden werden!'}
+            }
+
+            foundUser.password = newPassword
+            return { success: true} 
+        }
     },
 
     persist: true,
